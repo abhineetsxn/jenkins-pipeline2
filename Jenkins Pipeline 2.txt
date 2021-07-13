@@ -1,0 +1,77 @@
+	jenkins/jnlp-slave:3.27-1
+
+pipeline {
+  agent any
+  
+  stages {
+     
+	  stage('CleanWorkspace') {
+            steps {
+                cleanWs()
+            }
+        }
+		
+		
+	stage("Code Checkout"){
+            steps {
+                script {
+				
+                    sh "git clone https://github.com/techmartguru/jenkins-pipeline2.git"
+                   
+                    
+                }
+            }
+        }	
+		
+		
+		
+    stage("Build Step"){
+            steps {
+                script {
+				
+                    sh "cd $workspace";
+                    sh "ls -lhrt ";
+                    sh "cd jenkins-pipeline2; ls -lhrt ; mvn -version  "; 
+					sh " mvn clean install"
+                   
+                    
+                }
+            }
+        }
+	 stage(" Build Image"){
+            steps {
+                script {
+				
+                    sh "cd $workspace; cd jenkins-pipeline2";
+					sh "docker build -t java:v1.0 ."
+                      
+                }
+            }
+        }
+     
+	 	 stage(" Deploy Image"){
+            steps {
+                script {
+
+					sh "docker run -dit -p 8082:8082 java:v1.0"
+                      
+                }
+            }
+        }
+		
+	stage(" verify Deployment"){
+            steps {
+                script {
+
+					sh "docker ps "
+                      
+                }
+            }
+        }
+  
+  
+  
+  }
+
+}
+ 
